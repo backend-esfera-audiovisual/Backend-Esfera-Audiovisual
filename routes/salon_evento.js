@@ -37,7 +37,6 @@ router.post(
   [
     check("nombre_sal", "Digite el nombre del salón").not().isEmpty(),
     check("descripcion_sal", "Digite una descripción válida").not().isEmpty(),
-    check("galeria_sal", "Ingrese una galería válida").optional(),
     check("tipo_sal", "Ingrese un tipo de salón válido").not().isEmpty(),
     check("capacidad_sal", "Ingrese una capacidad válida").isInt({ min: 1 }),
     check("direccion_sal", "Digite una dirección válida").not().isEmpty(),

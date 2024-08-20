@@ -26,11 +26,11 @@ app.use("/api/ambiente", ambiente);
 app.use("/api/ciudad", ciudad_salon);
 app.use("/api/contacto", contacto_salon);
 app.use("/api/departamento", departamento_salon);
-app.use("/api/espacio-salon", espacio_salon);
+app.use("/api/espacio", espacio_salon);
 app.use("/api/reglamento", regalomento_salon);
 app.use("/api/reserva", reserva);
 app.use("/api/salon-evento", salon_evento);
-app.use("/api/servicio-salon", servicio_salon);
+app.use("/api/servicio", servicio_salon);
 
 
 const server = http.createServer(app)

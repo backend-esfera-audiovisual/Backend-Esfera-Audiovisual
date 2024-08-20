@@ -1,10 +1,13 @@
 import CiudadSalonEvento from "../models/ciudad_salon.js";
+import DepartamentoSalonEvento from "../models/departamento_salon.js";
 
 const httpCiudadSalonEvento = {
   // Obtener todos los eventos de ciudad de salón
   getAll: async (req, res) => {
     try {
-      const ciudadesSalonEvento = await CiudadSalonEvento.find().populate('idDepart');
+      const ciudadesSalonEvento = await CiudadSalonEvento.find().populate(
+        "idDepart"
+      );
       res.json(ciudadesSalonEvento);
     } catch (error) {
       res.status(500).json({ error });
@@ -15,11 +18,33 @@ const httpCiudadSalonEvento = {
   getPorId: async (req, res) => {
     try {
       const { id } = req.params;
-      const ciudadSalonEvento = await CiudadSalonEvento.findById(id).populate('idDepart');
-      if (!ciudadSalonEvento) return res.status(404).json({ message: "CiudadSalonEvento no encontrado" });
+      const ciudadSalonEvento = await CiudadSalonEvento.findById(id).populate(
+        "idDepart"
+      );
+      if (!ciudadSalonEvento)
+        return res
+          .status(404)
+          .json({ message: "CiudadSalonEvento no encontrado" });
       res.json(ciudadSalonEvento);
     } catch (error) {
       res.status(400).json({ error });
+    }
+  },
+  // Obtener ciudades por departamento
+  getCiudadesPorDepartamento: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      /* const departamento = await DepartamentoSalonEvento.findById(id); */
+
+      const ciudades = await CiudadSalonEvento.find({
+        idDepart: id,
+      });
+
+      res.json(ciudades);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al obtener las ciudades" });
     }
   },
 
@@ -27,7 +52,9 @@ const httpCiudadSalonEvento = {
   getPorNombre: async (req, res) => {
     try {
       const { nombre } = req.params;
-      const ciudadesSalonEvento = await CiudadSalonEvento.find({ nombre_ciud: nombre }).populate('idDepart');
+      const ciudadesSalonEvento = await CiudadSalonEvento.find({
+        nombre_ciud: nombre,
+      }).populate("idDepart");
       res.json(ciudadesSalonEvento);
     } catch (error) {
       res.status(500).json({ error });
@@ -65,9 +92,12 @@ const httpCiudadSalonEvento = {
           idDepart,
         },
         { new: true }
-      ).populate('idDepart');
+      ).populate("idDepart");
 
-      if (!ciudadSalonEvento) return res.status(404).json({ message: "CiudadSalonEvento no encontrado" });
+      if (!ciudadSalonEvento)
+        return res
+          .status(404)
+          .json({ message: "CiudadSalonEvento no encontrado" });
 
       res.json(ciudadSalonEvento);
     } catch (error) {
@@ -83,8 +113,11 @@ const httpCiudadSalonEvento = {
         id,
         { estado: true },
         { new: true }
-      ).populate('idDepart');
-      if (!ciudadSalonEvento) return res.status(404).json({ message: "CiudadSalonEvento no encontrado" });
+      ).populate("idDepart");
+      if (!ciudadSalonEvento)
+        return res
+          .status(404)
+          .json({ message: "CiudadSalonEvento no encontrado" });
       res.json(ciudadSalonEvento);
     } catch (error) {
       res.status(500).json({ error });
@@ -99,8 +132,11 @@ const httpCiudadSalonEvento = {
         id,
         { estado: false },
         { new: true }
-      ).populate('idDepart');
-      if (!ciudadSalonEvento) return res.status(404).json({ message: "CiudadSalonEvento no encontrado" });
+      ).populate("idDepart");
+      if (!ciudadSalonEvento)
+        return res
+          .status(404)
+          .json({ message: "CiudadSalonEvento no encontrado" });
       res.json(ciudadSalonEvento);
     } catch (error) {
       res.status(500).json({ error });
