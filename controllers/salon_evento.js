@@ -1,7 +1,7 @@
 import SalonEvento from "../models/salon_evento.js";
 
 const httpSalonEvento = {
-  // Obtener todos los eventos de salón
+  // Obtener todos los salones de evento
   getAll: async (req, res) => {
     try {
       const salonEventos = await SalonEvento.find()
@@ -16,7 +16,7 @@ const httpSalonEvento = {
     }
   },
 
-  // Obtener un evento de salón por ID
+  // Obtener salon por ID
   getPorId: async (req, res) => {
     try {
       const { id } = req.params;
@@ -33,7 +33,7 @@ const httpSalonEvento = {
     }
   },
 
-  // Obtener eventos de salón por ciudad
+  // Obtener salones por ciudad
   getPorCiudad: async (req, res) => {
     try {
       const { idCiudSalonEvento } = req.params;
@@ -49,7 +49,7 @@ const httpSalonEvento = {
     }
   },
 
-  // Registrar un nuevo evento de salón
+  // Registrar un nuevo salon de evento
   registro: async (req, res) => {
     try {
       const {
@@ -90,7 +90,7 @@ const httpSalonEvento = {
     }
   },
 
-  // Actualizar un evento de salón existente
+  // Actualizar un salon existente
   editar: async (req, res) => {
     try {
       const { id } = req.params;

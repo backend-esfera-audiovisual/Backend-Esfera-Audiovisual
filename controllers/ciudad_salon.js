@@ -2,7 +2,7 @@ import CiudadSalonEvento from "../models/ciudad_salon.js";
 import DepartamentoSalonEvento from "../models/departamento_salon.js";
 
 const httpCiudadSalonEvento = {
-  // Obtener todos los eventos de ciudad de salón
+  // Obtener todas las ciudades
   getAll: async (req, res) => {
     try {
       const ciudadesSalonEvento = await CiudadSalonEvento.find().populate(
@@ -14,7 +14,7 @@ const httpCiudadSalonEvento = {
     }
   },
 
-  // Obtener un evento de ciudad de salón por ID
+  // Obtener una ciudad por ID
   getPorId: async (req, res) => {
     try {
       const { id } = req.params;
@@ -48,7 +48,7 @@ const httpCiudadSalonEvento = {
     }
   },
 
-  // Obtener eventos de ciudad de salón por nombre
+  // Obtener ciudades por el nombre
   getPorNombre: async (req, res) => {
     try {
       const { nombre } = req.params;
@@ -61,7 +61,7 @@ const httpCiudadSalonEvento = {
     }
   },
 
-  // Registrar un nuevo evento de ciudad de salón
+  // Registrar una nueva ciudad
   registro: async (req, res) => {
     try {
       const { nombre_ciud, idDepart } = req.body;
@@ -79,7 +79,7 @@ const httpCiudadSalonEvento = {
     }
   },
 
-  // Actualizar un evento de ciudad de salón existente
+  // Actualizar una ciudad existente
   editar: async (req, res) => {
     try {
       const { id } = req.params;
