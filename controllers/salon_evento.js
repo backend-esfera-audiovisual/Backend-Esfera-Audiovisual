@@ -5,11 +5,14 @@ const httpSalonEvento = {
   getAll: async (req, res) => {
     try {
       const salonEventos = await SalonEvento.find()
-        .populate('idCiudSalonEvento')
-        .populate('idContactoSalon')
-        .populate('idAmbienteSalon')
-        .populate('idEspaciosSalon')
-        .populate('idServiciosSalon');
+        .populate({
+          path: "idCiudSalonEvento",
+          populate: { path: "idDepart" },
+        })
+        .populate("idContactoSalon")
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon");
       res.json(salonEventos);
     } catch (error) {
       res.status(500).json({ error });
@@ -21,12 +24,13 @@ const httpSalonEvento = {
     try {
       const { id } = req.params;
       const salonEvento = await SalonEvento.findById(id)
-        .populate('idCiudSalonEvento')
-        .populate('idContactoSalon')
-        .populate('idAmbienteSalon')
-        .populate('idEspaciosSalon')
-        .populate('idServiciosSalon');
-      if (!salonEvento) return res.status(404).json({ message: "Salon no encontrado" });
+        .populate("idCiudSalonEvento")
+        .populate("idContactoSalon")
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon");
+      if (!salonEvento)
+        return res.status(404).json({ message: "Salon no encontrado" });
       res.json(salonEvento);
     } catch (error) {
       res.status(400).json({ error });
@@ -38,11 +42,11 @@ const httpSalonEvento = {
     try {
       const { idCiudSalonEvento } = req.params;
       const salonEventos = await SalonEvento.find({ idCiudSalonEvento })
-        .populate('idCiudSalonEvento')
-        .populate('idContactoSalon')
-        .populate('idAmbienteSalon')
-        .populate('idEspaciosSalon')
-        .populate('idServiciosSalon');
+        .populate("idCiudSalonEvento")
+        .populate("idContactoSalon")
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon");
       res.json(salonEventos);
     } catch (error) {
       res.status(500).json({ error });
@@ -64,7 +68,7 @@ const httpSalonEvento = {
         idContactoSalon,
         idAmbienteSalon,
         idEspaciosSalon,
-        idServiciosSalon
+        idServiciosSalon,
       } = req.body;
 
       const salonEvento = new SalonEvento({
@@ -106,7 +110,7 @@ const httpSalonEvento = {
         idContactoSalon,
         idAmbienteSalon,
         idEspaciosSalon,
-        idServiciosSalon
+        idServiciosSalon,
       } = req.body;
 
       const salonEvento = await SalonEvento.findByIdAndUpdate(
@@ -127,13 +131,14 @@ const httpSalonEvento = {
         },
         { new: true }
       )
-      .populate('idCiudSalonEvento')
-      .populate('idContactoSalon')
-      .populate('idAmbienteSalon')
-      .populate('idEspaciosSalon')
-      .populate('idServiciosSalon');
+        .populate("idCiudSalonEvento")
+        .populate("idContactoSalon")
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon");
 
-      if (!salonEvento) return res.status(404).json({ message: "Salon no encontrado" });
+      if (!salonEvento)
+        return res.status(404).json({ message: "Salon no encontrado" });
 
       res.json(salonEvento);
     } catch (error) {
@@ -150,12 +155,13 @@ const httpSalonEvento = {
         { estado: true },
         { new: true }
       )
-      .populate('idCiudSalonEvento')
-      .populate('idContactoSalon')
-      .populate('idAmbienteSalon')
-      .populate('idEspaciosSalon')
-      .populate('idServiciosSalon');
-      if (!salonEvento) return res.status(404).json({ message: "Salon no encontrado" });
+        .populate("idCiudSalonEvento")
+        .populate("idContactoSalon")
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon");
+      if (!salonEvento)
+        return res.status(404).json({ message: "Salon no encontrado" });
       res.json(salonEvento);
     } catch (error) {
       res.status(500).json({ error });
@@ -171,12 +177,13 @@ const httpSalonEvento = {
         { estado: false },
         { new: true }
       )
-      .populate('idCiudSalonEvento')
-      .populate('idContactoSalon')
-      .populate('idAmbienteSalon')
-      .populate('idEspaciosSalon')
-      .populate('idServiciosSalon');
-      if (!salonEvento) return res.status(404).json({ message: "Salon no encontrado" });
+        .populate("idCiudSalonEvento")
+        .populate("idContactoSalon")
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon");
+      if (!salonEvento)
+        return res.status(404).json({ message: "Salon no encontrado" });
       res.json(salonEvento);
     } catch (error) {
       res.status(500).json({ error });
