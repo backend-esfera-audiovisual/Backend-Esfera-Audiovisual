@@ -31,6 +31,11 @@ router.get(
   httpSalonEvento.getPorCiudad
 );
 
+router.get('/salones/:location', httpSalonEvento.getSalonesByLocation);
+
+router.get('/filtro/:filtro', httpSalonEvento.getFilteredSalones);
+
+
 // Registrar un nuevo evento de salón
 router.post(
   "/registro",
