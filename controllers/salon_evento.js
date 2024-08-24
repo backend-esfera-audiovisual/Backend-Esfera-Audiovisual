@@ -106,59 +106,42 @@ const httpSalonEvento = {
 
   getFilteredSalones: async (req, res) => {
     try {
-      const {
-        capacidad_sal,
-        precio_sal,
-        idCiudSalonEvento,
-        idAmbienteSalon,
-        idEspaciosSalon,
-        idServiciosSalon,
-      } = req.query;
+      const { idCiudSalonEvento, idAmbienteSalon, idEspaciosSalon, idServiciosSalon, precio_sal, capacidad_sal } = req.query;
 
-      let filter = {};
+      // Crear un objeto de consulta vacío
+      let query = {};
 
-      // Filtrar por capacidad
-      if (capacidad_sal) {
-        filter.capacidad_sal = { $gte: capacidad_sal };
-      }
-
-      // Filtrar por precio
-      if (precio_sal) {
-        filter.precio_sal = { $lte: precio_sal };
-      }
-
-      // Filtrar por ciudad
+      // Agregar filtros condicionalmente
       if (idCiudSalonEvento) {
-        filter.idCiudSalonEvento = idCiudSalonEvento;
+        query.idCiudSalonEvento = idCiudSalonEvento;
       }
-
-      // Filtrar por ambiente
       if (idAmbienteSalon) {
-        filter.idAmbienteSalon = { $in: idAmbienteSalon.split(",") }; // Soporte para múltiples valores
+        query.idAmbienteSalon = { $in: idAmbienteSalon.split(',') };
       }
-
-      // Filtrar por espacio
       if (idEspaciosSalon) {
-        filter.idEspaciosSalon = { $in: idEspaciosSalon.split(",") }; // Soporte para múltiples valores
+        query.idEspaciosSalon = { $in: idEspaciosSalon.split(',') };
       }
-
-      // Filtrar por servicio
       if (idServiciosSalon) {
-        filter.idServiciosSalon = { $in: idServiciosSalon.split(",") }; // Soporte para múltiples valores
+        query.idServiciosSalon = { $in: idServiciosSalon.split(',') };
+      }
+      if (precio_sal) {
+        query.precio_sal = { $lte: precio_sal };
+      }
+      if (capacidad_sal) {
+        query.capacidad_sal = { $gte: capacidad_sal };
       }
 
-      // Buscar salones basados en los filtros aplicados
-      const salones = await SalonEvento.find(filter)
-        .populate("idCiudSalonEvento")
-        .populate("idContactoSalon")
-        .populate("idAmbienteSalon")
-        .populate("idEspaciosSalon")
-        .populate("idServiciosSalon");
+      // Ejecutar la consulta con los filtros aplicados
+      const salones = await SalonEvento.find(query)
+        .populate('idCiudSalonEvento')
+        .populate('idAmbienteSalon')
+        .populate('idEspaciosSalon')
+        .populate('idServiciosSalon')
+        .exec();
 
       res.status(200).json(salones);
     } catch (error) {
-      console.error("Error fetching filtered salones:", error);
-      res.status(500).json({ message: "Error fetching filtered salones" });
+      res.status(500).json({ message: 'Error al filtrar los salones', error });
     }
   },
 

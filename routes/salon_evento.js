@@ -11,6 +11,9 @@ router.get(
   httpSalonEvento.getAll
 );
 
+router.get("/salones", httpSalonEvento.getFilteredSalones)
+
+
 // Obtener un evento de salón por ID
 router.get(
   "/:id",
@@ -33,7 +36,7 @@ router.get(
 
 router.get('/salones/:location', httpSalonEvento.getSalonesByLocation);
 
-router.get('/filtro/:filtro', httpSalonEvento.getFilteredSalones);
+
 
 
 // Registrar un nuevo evento de salón
