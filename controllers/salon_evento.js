@@ -106,34 +106,55 @@ const httpSalonEvento = {
 
   getFilteredSalones: async (req, res) => {
     try {
-      const { idCiudSalonEvento, idAmbienteSalon, idEspaciosSalon, idServiciosSalon, precio_sal, capacidad_sal } = req.query;
+      const {
+        idCiudSalonEvento,
+        idAmbienteSalon,
+        idEspaciosSalon,
+        idServiciosSalon,
+        precio_sal,
+        capacidad_sal
+      } = req.query;
 
-      // Crear un objeto de consulta vacío
       let query = {};
 
-      // Agregar filtros condicionalmente
       if (idCiudSalonEvento) {
-        query.idCiudSalonEvento = idCiudSalonEvento;
+        const ciudades = await CiudadSalonEvento.find({
+          $or: [
+            { _id: idCiudSalonEvento },
+            { idDepart: idCiudSalonEvento }
+          ]
+        }).select('_id');
+
+        const ciudadIds = ciudades.map(ciudad => ciudad._id);
+        query.idCiudSalonEvento = { $in: ciudadIds };
       }
+
       if (idAmbienteSalon) {
-        query.idAmbienteSalon = { $in: idAmbienteSalon.split(',') };
+        const ambienteSalonIds = idAmbienteSalon.split(',');
+        query.idAmbienteSalon = { $all: ambienteSalonIds };
       }
+
       if (idEspaciosSalon) {
-        query.idEspaciosSalon = { $in: idEspaciosSalon.split(',') };
+        const espaciosSalonIds = idEspaciosSalon.split(',');
+        query.idEspaciosSalon = { $all: espaciosSalonIds };
       }
       if (idServiciosSalon) {
-        query.idServiciosSalon = { $in: idServiciosSalon.split(',') };
+        const serviciosSalonIds = idServiciosSalon.split(',');
+        query.idServiciosSalon = { $all: serviciosSalonIds };
       }
       if (precio_sal) {
         query.precio_sal = { $lte: precio_sal };
       }
       if (capacidad_sal) {
-        query.capacidad_sal = { $gte: capacidad_sal };
+        const [minCapacidad, maxCapacidad] = capacidad_sal.split('-').map(Number);
+        query.capacidad_sal = { $gte: minCapacidad, $lte: maxCapacidad };
       }
 
-      // Ejecutar la consulta con los filtros aplicados
       const salones = await SalonEvento.find(query)
-        .populate('idCiudSalonEvento')
+        .populate({
+          path: "idCiudSalonEvento",
+          populate: { path: "idDepart" },
+        })
         .populate('idAmbienteSalon')
         .populate('idEspaciosSalon')
         .populate('idServiciosSalon')
@@ -144,6 +165,8 @@ const httpSalonEvento = {
       res.status(500).json({ message: 'Error al filtrar los salones', error });
     }
   },
+
+
 
   // Registrar un nuevo salon de evento
   registro: async (req, res) => {
