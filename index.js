@@ -13,6 +13,8 @@ import regalomento_salon from './routes/reglamento_salon.js';
 import reserva from './routes/reserva.js';
 import salon_evento from './routes/salon_evento.js';
 import servicio_salon from './routes/servicio_salon.js';
+import tipo_salon from './routes/tipo_salon.js';
+import ubicacion_salon from './routes/ubicacion_salon.js';
 
 
 const app = express();
@@ -31,6 +33,8 @@ app.use("/api/reglamento", regalomento_salon);
 app.use("/api/reserva", reserva);
 app.use("/api/salon-evento", salon_evento);
 app.use("/api/servicio", servicio_salon);
+app.use("/api/tipo", tipo_salon);
+app.use("/api/ubicacion", ubicacion_salon);
 
 
 const server = http.createServer(app)

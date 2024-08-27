@@ -45,7 +45,6 @@ router.post(
   [
     check("nombre_sal", "Digite el nombre del salón").not().isEmpty(),
     check("descripcion_sal", "Digite una descripción válida").not().isEmpty(),
-    check("tipo_sal", "Ingrese un tipo de salón válido").not().isEmpty(),
     check("capacidad_sal", "Ingrese una capacidad válida").isInt({ min: 1 }),
     check("direccion_sal", "Digite una dirección válida").not().isEmpty(),
     check("precio_sal", "Ingrese un precio válido").isFloat({ min: 0 }),
@@ -54,6 +53,8 @@ router.post(
     check("idAmbienteSalon", "Ingrese un ID de ambiente de salón válido").isMongoId(),
     check("idEspaciosSalon", "Ingrese un ID de espacios de salón válido").isMongoId(),
     check("idServiciosSalon", "Ingrese un ID de servicios de salón válido").isMongoId(),
+    check("idTipoSalon", "Ingrese un ID de tipo salon válido").isMongoId(),
+    check("idUbicacionSalon", "Ingrese un ID de ubicacion de salon válido").isMongoId(),
     validarCampos,
   ],
   httpSalonEvento.registro
@@ -67,7 +68,6 @@ router.put(
     check("nombre_sal", "Digite el nombre del salón").not().isEmpty(),
     check("descripcion_sal", "Digite una descripción válida").not().isEmpty(),
     check("galeria_sal", "Ingrese una galería válida").optional(),
-    check("tipo_sal", "Ingrese un tipo de salón válido").not().isEmpty(),
     check("capacidad_sal", "Ingrese una capacidad válida").isInt({ min: 1 }),
     check("direccion_sal", "Digite una dirección válida").not().isEmpty(),
     check("precio_sal", "Ingrese un precio válido").isFloat({ min: 0 }),
@@ -76,6 +76,8 @@ router.put(
     check("idAmbienteSalon", "Ingrese un ID de ambiente de salón válido").isMongoId(),
     check("idEspaciosSalon", "Ingrese un ID de espacios de salón válido").isMongoId(),
     check("idServiciosSalon", "Ingrese un ID de servicios de salón válido").isMongoId(),
+    check("idTipoSalon", "Ingrese un ID de tipo salon válido").isMongoId(),
+    check("idUbicacionSalon", "Ingrese un ID de ubicacion de salon válido").isMongoId(),
     validarCampos,
   ],
   httpSalonEvento.editar
