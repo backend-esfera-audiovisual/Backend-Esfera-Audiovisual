@@ -122,52 +122,57 @@ const httpSalonEvento = {
         idTipoSalon,
         idUbicacionSalon,
         precio_sal,
-        capacidad_sal
+        capacidad_sal, // Este parámetro sigue viniendo como un rango, por ejemplo "100-199"
       } = req.query;
 
       let query = {};
 
       if (idCiudSalonEvento) {
         const ciudades = await CiudadSalonEvento.find({
-          $or: [
-            { _id: idCiudSalonEvento },
-            { idDepart: idCiudSalonEvento }
-          ]
-        }).select('_id');
+          $or: [{ _id: idCiudSalonEvento }, { idDepart: idCiudSalonEvento }],
+        }).select("_id");
 
-        const ciudadIds = ciudades.map(ciudad => ciudad._id);
+        const ciudadIds = ciudades.map((ciudad) => ciudad._id);
         query.idCiudSalonEvento = { $in: ciudadIds };
       }
 
       if (idAmbienteSalon) {
-        const ambienteSalonIds = idAmbienteSalon.split(',');
+        const ambienteSalonIds = idAmbienteSalon.split(",");
         query.idAmbienteSalon = { $all: ambienteSalonIds };
       }
 
       if (idEspaciosSalon) {
-        const espaciosSalonIds = idEspaciosSalon.split(',');
+        const espaciosSalonIds = idEspaciosSalon.split(",");
         query.idEspaciosSalon = { $all: espaciosSalonIds };
       }
+
       if (idServiciosSalon) {
-        const serviciosSalonIds = idServiciosSalon.split(',');
+        const serviciosSalonIds = idServiciosSalon.split(",");
         query.idServiciosSalon = { $all: serviciosSalonIds };
       }
 
       if (idTipoSalon) {
-        const tipoSalonIds = idTipoSalon.split(',');
+        const tipoSalonIds = idTipoSalon.split(",");
         query.idTipoSalon = { $all: tipoSalonIds };
       }
 
       if (idUbicacionSalon) {
-        const ubicacionSalonIds = idUbicacionSalon.split(',');
+        const ubicacionSalonIds = idUbicacionSalon.split(",");
         query.idUbicacionSalon = { $all: ubicacionSalonIds };
       }
+
       if (precio_sal) {
         query.precio_sal = { $lte: precio_sal };
       }
+
       if (capacidad_sal) {
-        const [minCapacidad, maxCapacidad] = capacidad_sal.split('-').map(Number);
-        query.capacidad_sal = { $gte: minCapacidad, $lte: maxCapacidad };
+        const [capacidadMin, capacidadMax] = capacidad_sal
+          .split("-")
+          .map(Number);
+        query.$and = [
+          { capacidad_min: { $lte: capacidadMax } }, // capacidad_max >= capacidadMin
+          { capacidad_max: { $gte: capacidadMin } }, // capacidad_min <= capacidadMax
+        ];
       }
 
       const salones = await SalonEvento.find(query)
@@ -175,20 +180,18 @@ const httpSalonEvento = {
           path: "idCiudSalonEvento",
           populate: { path: "idDepart" },
         })
-        .populate('idAmbienteSalon')
-        .populate('idEspaciosSalon')
-        .populate('idServiciosSalon')
-        .populate('idTipoSalon')
-        .populate('idUbicacionSalon')
+        .populate("idAmbienteSalon")
+        .populate("idEspaciosSalon")
+        .populate("idServiciosSalon")
+        .populate("idTipoSalon")
+        .populate("idUbicacionSalon")
         .exec();
 
       res.status(200).json(salones);
     } catch (error) {
-      res.status(500).json({ message: 'Error al filtrar los salones', error });
+      res.status(500).json({ message: "Error al filtrar los salones", error });
     }
   },
-
-
 
   // Registrar un nuevo salon de evento
   registro: async (req, res) => {
@@ -198,7 +201,8 @@ const httpSalonEvento = {
         descripcion_sal,
         galeria_sal,
         tipo_sal,
-        capacidad_sal,
+        capacidad_min,
+        capacidad_max,
         direccion_sal,
         precio_sal,
         idCiudSalonEvento,
@@ -215,7 +219,8 @@ const httpSalonEvento = {
         descripcion_sal,
         galeria_sal,
         tipo_sal,
-        capacidad_sal,
+        capacidad_min,
+        capacidad_max,
         direccion_sal,
         precio_sal,
         idCiudSalonEvento,
@@ -244,7 +249,8 @@ const httpSalonEvento = {
         descripcion_sal,
         galeria_sal,
         tipo_sal,
-        capacidad_sal,
+        capacidad_min,
+        capacidad_max,
         direccion_sal,
         precio_sal,
         idCiudSalonEvento,
@@ -263,7 +269,8 @@ const httpSalonEvento = {
           descripcion_sal,
           galeria_sal,
           tipo_sal,
-          capacidad_sal,
+          capacidad_min,
+          capacidad_max,
           direccion_sal,
           precio_sal,
           idCiudSalonEvento,
