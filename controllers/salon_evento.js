@@ -153,12 +153,12 @@ const httpSalonEvento = {
 
       if (idTipoSalon) {
         const tipoSalonIds = idTipoSalon.split(",");
-        query.idTipoSalon = { $all: tipoSalonIds };
+        query.idTipoSalon = { $in: tipoSalonIds };
       }
 
       if (idUbicacionSalon) {
         const ubicacionSalonIds = idUbicacionSalon.split(",");
-        query.idUbicacionSalon = { $all: ubicacionSalonIds };
+        query.idUbicacionSalon = { $in: ubicacionSalonIds };
       }
 
       if (precio_sal) {
