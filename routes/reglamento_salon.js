@@ -21,6 +21,16 @@ router.get(
   httpReglamentoSalon.getPorId
 );
 
+// Obtener un reglamento de salón evento
+router.get(
+  "/buscarPorSalon/:idSalonEvento",
+  [
+    check("idSalonEvento", "Ingrese una ID válida").isMongoId(),
+    validarCampos,
+  ],
+  httpReglamentoSalon.getPorSalonEvento
+);
+
 // Registrar un nuevo reglamento de salón
 router.post(
   "/registro",

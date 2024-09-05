@@ -23,6 +23,17 @@ const httpReglamentoSalon = {
     }
   },
 
+  getPorSalonEvento: async (req, res) => {
+    try {
+      const { idSalonEvento } = req.params;
+      const reglamentoSalon = await ReglamentoSalon.findOne({ idSalonEvento }).populate('idSalonEvento');
+      if (!reglamentoSalon) return res.status(404).json({ message: "No se encontró un reglamento para este salón" });
+      res.json(reglamentoSalon);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  },
+
   // Registrar un nuevo reglamento de salón
   registro: async (req, res) => {
     try {
