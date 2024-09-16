@@ -64,11 +64,13 @@ const httpCiudadSalonEvento = {
   // Registrar una nueva ciudad
   registro: async (req, res) => {
     try {
-      const { nombre_ciud, idDepart } = req.body;
+      const { nombre_ciud, idDepart, longitud, altitud } = req.body;
 
       const ciudadSalonEvento = new CiudadSalonEvento({
         nombre_ciud,
         idDepart,
+        longitud,
+        altitud,
       });
 
       await ciudadSalonEvento.save();
@@ -83,13 +85,15 @@ const httpCiudadSalonEvento = {
   editar: async (req, res) => {
     try {
       const { id } = req.params;
-      const { nombre_ciud, idDepart } = req.body;
+      const { nombre_ciud, idDepart, longitud, altitud } = req.body;
 
       const ciudadSalonEvento = await CiudadSalonEvento.findByIdAndUpdate(
         id,
         {
           nombre_ciud,
           idDepart,
+          longitud,
+          altitud,
         },
         { new: true }
       ).populate("idDepart");

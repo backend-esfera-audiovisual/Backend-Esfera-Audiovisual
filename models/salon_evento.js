@@ -8,6 +8,8 @@ const salonEventoSchema = new mongoose.Schema({
     capacidad_max: { type: Number, required: true }, 
     direccion_sal: { type: String, required: true },
     precio_sal: { type: Number, required: true },
+    altitud: { type: String, required: true },
+    longitud: { type: String, required: true },
     idCiudSalonEvento: { type: mongoose.Schema.Types.ObjectId, ref: "CiudadSalonEvento", required: true },
     idContactoSalon: { type: mongoose.Schema.Types.ObjectId, ref: "ContactoSalon", required: true },
     idAmbienteSalon: [{ type: mongoose.Schema.Types.ObjectId, ref: "AmbienteSalon", required: true }],

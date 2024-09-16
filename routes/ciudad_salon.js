@@ -39,6 +39,8 @@ router.post(
   "/registro",
   [
     check("nombre_ciud", "Digite el nombre de la ciudad").not().isEmpty(),
+    check("altitud", "Digite la altitud de la ciudad").not().isEmpty(),
+    check("longitud", "Digite la longitud de la ciudad").not().isEmpty(),
     check("idDepart", "Ingrese un ID de departamento válido").isMongoId(),
     validarCampos,
   ],
@@ -51,6 +53,8 @@ router.put(
   [
     check("id", "Ingrese una ID válida").isMongoId(),
     check("nombre_ciud", "Digite el nombre de la ciudad").not().isEmpty(),
+    check("altitud", "Digite la altitud de la ciudad").not().isEmpty(),
+    check("longitud", "Digite la longitud de la ciudad").not().isEmpty(),
     check("idDepart", "Ingrese un ID de departamento válido").isMongoId(),
     validarCampos,
   ],

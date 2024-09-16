@@ -37,10 +37,11 @@ const httpDepartamentoSalonEvento = {
   // Registrar un nuevo departamento de salón de eventos
   registro: async (req, res) => {
     try {
-      const { nombre_depart } = req.body;
+      const { nombre_depart, longitud, altitud  } = req.body;
 
       const departamentoSalonEvento = new DepartamentoSalonEvento({
         nombre_depart,
+        longitud, altitud 
       });
 
       await departamentoSalonEvento.save();
@@ -55,12 +56,14 @@ const httpDepartamentoSalonEvento = {
   editar: async (req, res) => {
     try {
       const { id } = req.params;
-      const { nombre_depart } = req.body;
+      const { nombre_depart,  longitud, altitud  } = req.body;
 
       const departamentoSalonEvento = await DepartamentoSalonEvento.findByIdAndUpdate(
         id,
         {
           nombre_depart,
+          longitud, 
+          altitud,
         },
         { new: true }
       );
