@@ -23,8 +23,8 @@ router.post(
   "/registro",
   [
     check("nombre_depart", "Digite el nombre del departamento").not().isEmpty(),
-    check("altitud", "Digite la altitud de la ciudad").not().isEmpty(),
-    check("longitud", "Digite la longitud de la ciudad").not().isEmpty(),
+    check("latitud", "Digite la latitud del departamento").not().isEmpty(),
+    check("longitud", "Digite la longitud del departamento").not().isEmpty(),
     validarCampos,
   ],
   httpDepartamentoSalonEvento.registro
@@ -36,8 +36,8 @@ router.put(
   [
     check("id", "Ingrese una ID válida").isMongoId(),
     check("nombre_depart", "Digite el nombre del departamento").not().isEmpty(),
-    check("altitud", "Digite la altitud de la ciudad").not().isEmpty(),
-    check("longitud", "Digite la longitud de la ciudad").not().isEmpty(),
+    check("latitud", "Digite la latitud del departamento").not().isEmpty(),
+    check("longitud", "Digite la longitud del departamento").not().isEmpty(),
     validarCampos,
   ],
   httpDepartamentoSalonEvento.editar

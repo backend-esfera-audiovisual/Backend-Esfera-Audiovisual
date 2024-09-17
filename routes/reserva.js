@@ -11,6 +11,12 @@ router.get(
   httpReserva.getAll
 );
 
+//Contactanos
+router.get(
+  "/contacto",
+  httpReserva.contactanos
+);
+
 // Obtener una reserva por ID
 router.get(
   "/:id",
@@ -27,6 +33,8 @@ router.get(
   httpReserva.getPorNombreCliente
 );
 
+
+
 // Registrar una nueva reserva
 router.post(
   "/registro",
@@ -34,7 +42,7 @@ router.post(
     check("nombre_cliente", "Digite el nombre del cliente").not().isEmpty(),
     check("correo_cliente", "Ingrese un correo electrónico válido").isEmail(),
     check("telefono_cliente", "Ingrese un número de teléfono válido").isMobilePhone(),
-    check("cant_pers_res", "Ingrese una cantidad de personas válida").isInt({ min: 1 }),
+    check("cant_pers_res", "Ingrese una cantidad de personas válida").not().isEmpty(),
     check("fecha_res", "Ingrese una fecha válida").isISO8601(),
     check("idSalonEvento", "Ingrese un ID de salón de evento válido").isMongoId(),
     validarCampos,

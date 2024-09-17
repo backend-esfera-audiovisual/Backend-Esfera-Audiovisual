@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const departamentoSalonEventoSchema = new mongoose.Schema({
     nombre_depart: { type: String, required: true },
-    altitud: { type: String, required: true },
+    latitud: { type: String, required: true },
     longitud: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     estado: { type: Boolean, default: 1 }
