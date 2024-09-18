@@ -1,6 +1,7 @@
 import Reserva from "../models/reserva.js";
 import nodemailer from "nodemailer";
 import SalonEvento from "../models/salon_evento.js";
+import Admin from "../models/administrador.js";
 
 const httpReserva = {
   // Obtener todas las reservas
@@ -39,28 +40,33 @@ const httpReserva = {
     }
   },
 
+  //Redirigir a chat de WhatsApp
   contactanos: async (req, res) => {
     try {
-      // Definir el número de teléfono de WhatsApp (en formato internacional)
-      const numeroWhatsApp = "573103370459";
+      const administrador = await Admin.findOne(); // Buscar el administrador
+      if (!administrador || !administrador.telefono) {
+        return res.status(404).json({
+          error: "No se encontró el administrador o su número de teléfono",
+        });
+      }
 
-      // Mensaje predeterminado (opcional, puedes dejarlo vacío si no lo necesitas)
+      const numeroWhatsApp = `57${administrador.telefono}`;
+
       const mensajeWhatsApp =
-        "Hola, me gustaría postular mi salón de eventos en tú pagina web, podrías darme más información por favor";
+        "Hola, me gustaría postular mi salón de eventos en tu página web, ¿podrías darme más información por favor?";
 
-      // Crear el enlace de WhatsApp con el mensaje
       const enlaceWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
         mensajeWhatsApp
       )}`;
 
-      // Redireccionar al enlace de WhatsApp
+      // Return the WhatsApp link as a JSON response
       res.json({ link: enlaceWhatsApp });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
 
-  // Registrar una nueva reserva
+  // Registrar una nueva reserva y enviar correos
   registro: async (req, res) => {
     try {
       const {
@@ -73,18 +79,40 @@ const httpReserva = {
         idSalonEvento,
       } = req.body;
 
-      // Crear la nueva reserva
-      const reserva = new Reserva({
-        nombre_cliente,
+      // Verificar si ya existe una reserva con el correo del cliente para el mismo salón y fecha
+      const reservaExistente = await Reserva.findOne({
         correo_cliente,
-        telefono_cliente,
-        cant_pers_res,
-        fecha_res,
-        mensaje_res,
         idSalonEvento,
       });
 
-      await reserva.save();
+      let reserva;
+
+      if (reservaExistente) {
+        // Si la reserva ya existe, actualizarla con la nueva información
+        reservaExistente.nombre_cliente = nombre_cliente;
+        reservaExistente.telefono_cliente = telefono_cliente;
+        reservaExistente.cant_pers_res = cant_pers_res;
+        reservaExistente.fecha_res = fecha_res;
+        reservaExistente.mensaje_res = mensaje_res;
+
+        // Guardar los cambios
+        reserva = await reservaExistente.save();
+        console.log("Reserva actualizada:", reserva);
+      } else {
+        // Si no existe, crear una nueva reserva
+        reserva = new Reserva({
+          nombre_cliente,
+          correo_cliente,
+          telefono_cliente,
+          cant_pers_res,
+          fecha_res,
+          mensaje_res,
+          idSalonEvento,
+        });
+
+        await reserva.save();
+        console.log("Nueva reserva creada:", reserva);
+      }
 
       // Buscar el salón para obtener el correo del contacto asociado
       const salon = await SalonEvento.findById(idSalonEvento)
@@ -101,11 +129,16 @@ const httpReserva = {
           .json({ error: "No se encontró el salón o su contacto" });
       }
 
-      // Debugging: Asegurarse de que el salón y el contacto existen
-      console.log("Salon encontrado: ", salon);
-      console.log("Contacto del salón: ", salon.idContactoSalon);
+      const admin = await Admin.findOne();
+
+      if (!admin) {
+        return res
+          .status(404)
+          .json({ error: "No se encontró el administrador" });
+      }
 
       const correoContactoSalon = salon.idContactoSalon.correo_cont;
+      const correoAdmin = admin.correo;
 
       // Configurar el transporte de nodemailer
       const transporter = nodemailer.createTransport({
@@ -116,9 +149,16 @@ const httpReserva = {
         },
       });
 
-      const mailOptionsCliente = {
+      const fechaFormateada = new Date(fecha_res).toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+
+      // Correo del cliente
+      const enviarCorreoCliente = {
         from: process.env.userEmail,
-        to: correo_cliente, // Correo del cliente
+        to: correo_cliente,
         subject: "Solicitud de reserva para salón de evento",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;">
@@ -145,10 +185,10 @@ const httpReserva = {
             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
               <tr>
                 <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Nombre:</strong> ${nombre_cliente}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>E-Mail:</strong> ${correo_cliente}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Correo:</strong> ${correo_cliente}</td>
               </tr>
               <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Fecha Evento:</strong> ${fecha_res}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Fecha Evento:</strong> ${fechaFormateada}</td>
                 <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Teléfono:</strong> ${telefono_cliente}</td>
               </tr>
               <tr>
@@ -159,9 +199,10 @@ const httpReserva = {
         `,
       };
 
-      const mailOptionsSalon = {
+      // Correo del contacto del salón
+      const enviarCorreoContactoSalon = {
         from: process.env.userEmail,
-        to: correoContactoSalon, // Correo del contacto del salón
+        to: correoContactoSalon,
         subject: "Nueva reserva confirmada - Esfera Audiovisual",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;">
@@ -183,7 +224,7 @@ const httpReserva = {
               </div>
             </div>
       
-            <h3>Detalles de la reserva <span style="float: right; font-size: 14px;">Confirmada el ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</span></h3>
+            <h3>Detalles de la reserva <span style="float: right; font-size: 14px;">Enviada el ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</span></h3>
       
             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
               <tr>
@@ -191,8 +232,59 @@ const httpReserva = {
                 <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>N.º Personas:</strong> ${cant_pers_res}</td>
               </tr>
               <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Fecha Evento:</strong> ${fecha_res}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Fecha Evento:</strong> ${fechaFormateada}</td>
                 <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Teléfono Cliente:</strong> ${telefono_cliente}</td>
+              </tr>
+               <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Correo Cliente:</strong> ${correo_cliente}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Mensaje Cliente:</strong> ${mensaje_res}</td>
+              </tr>
+            </table>
+          </div>
+        `,
+      };
+
+      // Correo del administrador
+      const enviarCorreoAdmin = {
+        from: process.env.userEmail,
+        to: correoAdmin,
+        subject: `Nueva reserva confirmada - ${salon.nombre_sal} - Esfera Audiovisual`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;">
+            <div style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center;">
+              <div style="flex-grow: 1;">
+                <h2 style="color: #E53935;">
+                  Nueva reserva confirmada para el salón ${salon.nombre_sal}
+                </h2>
+                <p style="font-size: 14px;color: #000000;font-weight: bold">${
+                  salon.idCiudSalonEvento.nombre_ciud
+                }, ${salon.idCiudSalonEvento.idDepart.nombre_depart}</p>
+                <p><strong>Dirección Salón:</strong> ${salon.direccion_sal}</p>
+                <p><strong>Teléfono Salón:</strong> ${salon.idContactoSalon.telefono_cont}</p>
+                <p><strong>Correo Salón:</strong> ${salon.idContactoSalon.correo_cont}</p>
+              </div>
+              <div style="margin-left: 20px;">
+                <img src="${
+                  salon.galeria_sal[0]?.url
+                }" alt="Imagen del salón" style="width: 150px; height: auto; border-radius: 8px; object-fit: cover;" />
+              </div>
+            </div>
+      
+            <h3>Detalles de la reserva <span style="float: right; font-size: 14px;">Enviada el ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</span></h3>
+      
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Cliente:</strong> ${nombre_cliente}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>N.º Personas:</strong> ${cant_pers_res}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Fecha Evento:</strong> ${fechaFormateada}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Teléfono Cliente:</strong> ${telefono_cliente}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Correo Cliente:</strong> ${correo_cliente}</td>
               </tr>
               <tr>
                 <td colspan="2" style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Mensaje:</strong> ${mensaje_res}</td>
@@ -204,13 +296,13 @@ const httpReserva = {
 
       // Enviar ambos correos de forma asíncrona
       await Promise.all([
-        transporter.sendMail(mailOptionsCliente),
-        transporter.sendMail(mailOptionsSalon),
+        transporter.sendMail(enviarCorreoCliente),
+        transporter.sendMail(enviarCorreoContactoSalon),
+        transporter.sendMail(enviarCorreoAdmin),
       ]);
 
       res.json(reserva);
     } catch (error) {
-      // Asegurarse de mostrar el error en detalle
       console.error("Error en el proceso de reserva: ", error);
       res.status(500).json({ error: error.message });
     }

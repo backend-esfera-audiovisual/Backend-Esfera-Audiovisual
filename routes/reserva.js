@@ -42,8 +42,8 @@ router.post(
     check("nombre_cliente", "Digite el nombre del cliente").not().isEmpty(),
     check("correo_cliente", "Ingrese un correo electrónico válido").isEmail(),
     check("telefono_cliente", "Ingrese un número de teléfono válido").isMobilePhone(),
-    check("cant_pers_res", "Ingrese una cantidad de personas válida").not().isEmpty(),
     check("fecha_res", "Ingrese una fecha válida").isISO8601(),
+    check("cant_pers_res", "Ingrese una cantidad de personas válida").not().isEmpty(),
     check("idSalonEvento", "Ingrese un ID de salón de evento válido").isMongoId(),
     validarCampos,
   ],
@@ -55,7 +55,7 @@ router.put(
   "/editar/:id",
   [
     check("id", "Ingrese una ID válida").isMongoId(),
-    check("nombre_cliente", "Digite el nombre del cliente").not().isEmpty(),
+    check("nombre_cliente", "Digite el nombre ").not().isEmpty(),
     check("correo_cliente", "Ingrese un correo electrónico válido").isEmail(),
     check("telefono_cliente", "Ingrese un número de teléfono válido").isMobilePhone(),
     check("cant_pers_res", "Ingrese una cantidad de personas válida").isInt({ min: 1 }),
