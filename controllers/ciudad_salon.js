@@ -39,7 +39,7 @@ const httpCiudadSalonEvento = {
 
       const ciudades = await CiudadSalonEvento.find({
         idDepart: id,
-      });
+      }).populate("idDepart");
 
       res.json(ciudades);
     } catch (error) {
