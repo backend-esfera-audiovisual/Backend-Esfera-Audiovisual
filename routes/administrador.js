@@ -4,6 +4,7 @@ import { check } from "express-validator";
 import validarCampos from "../middlewares/validar.js";
 import { validarJWT } from "../middlewares/validar-jwt.js";
 import helpersAdministrador from "../helpers/administrador.js"; // Asumiendo que necesitas un archivo similar para validaciones
+import helpersUsuario from "../helpers/usuario.js";
 
 const router = new Router();
 
@@ -13,6 +14,21 @@ router.get(
   validarJWT, // Protege esta ruta para que solo usuarios autenticados puedan acceder
   httpAdministrador.getAll
 );
+
+router.get(
+  "/codigo-recuperar/:correo",
+  [
+    check("correo", "Por favor ingrese el correo").not().isEmpty(),
+    check("correo").custom(helpersUsuario.existeCorreo),
+    validarCampos,
+  ],
+  httpAdministrador.codigoRecuperar
+);
+
+router.get("/confirmar-codigo/:codigo", [
+  check('codigo', 'Ingrese el código').not().isEmpty(),
+  validarCampos
+], httpAdministrador.confirmarCodigo);
 
 // Registrar un nuevo administrador
 router.post(
@@ -32,6 +48,35 @@ router.post(
   ],
   httpAdministrador.registroAdministrador
 );
+
+router.put(
+  "/cambioPassword/:id",
+  [
+    validarJWT,
+    check("id", "Digite el id").not().isEmpty(),
+    check("id", "No es mongo id").isMongoId(),
+    check("password", "Digite la contraseña").not().isEmpty(),
+    check("newPassword", "Digite la nueva contraseña").not().isEmpty(),
+    check(
+      "newPassword",
+      "La contraseña debe contener al menos 1 mayúscula, 1 minúscula, al menos 2 números y un carácter especial"
+    ).custom(helpersUsuario.validarPassword),
+  ],
+  httpAdministrador.putCambioPassword
+);
+
+router.put("/nueva-password", [
+  check("correo", "Por favor ingrese el correo").not().isEmpty(),
+  check("correo").custom(helpersUsuario.existeCorreoNewPass),
+  check('codigo', 'Ingrese el código').not().isEmpty(),
+  check('password', 'Ingrese la password').not().isEmpty(),
+  check(
+    "password",
+    "La contraseña debe contener al menos 1 mayúscula, 1 minúscula, al menos 2 números y un carácter especial"
+  ).custom(helpersUsuario.validarPassword),
+  validarCampos,
+], httpAdministrador.nuevaPassword);
+
 
 // Autenticación de administrador
 router.post(
