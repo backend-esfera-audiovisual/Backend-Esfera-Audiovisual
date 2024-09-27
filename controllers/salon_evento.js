@@ -28,7 +28,10 @@ const httpSalonEvento = {
     try {
       const { id } = req.params;
       const salonEvento = await SalonEvento.findById(id)
-        .populate("idCiudSalonEvento")
+        .populate({
+          path: "idCiudSalonEvento",
+          populate: { path: "idDepart" },
+        })
         .populate("idContactoSalon")
         .populate("idAmbienteSalon")
         .populate("idEspaciosSalon")
