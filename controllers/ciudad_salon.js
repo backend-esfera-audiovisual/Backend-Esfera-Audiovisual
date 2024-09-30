@@ -71,11 +71,14 @@ const httpCiudadSalonEvento = {
         idDepart,
         longitud,
         latitud,
-      }).populate("idDepart");
+      });
+
+      await ciudadSalonEvento.save();
 
 
       res.json(ciudadSalonEvento);
     } catch (error) {
+      console.log(error)
       res.status(500).json({ error });
     }
   },

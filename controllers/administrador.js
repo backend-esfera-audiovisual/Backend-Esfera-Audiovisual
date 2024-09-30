@@ -1,6 +1,19 @@
 import Administrador from "../models/administrador.js";
 import bcryptjs from "bcryptjs";
+import nodemailer from "nodemailer";
 import { generarJWT } from "../middlewares/validar-jwt.js";
+
+let codigoEnviado = {};
+
+function generarNumeroAleatorio() {
+  let numeroAleatorio = Math.floor(Math.random() * 1000000);
+  let numero = numeroAleatorio.toString().padStart(6, "0");
+  let fechaCreacion = new Date();
+
+  codigoEnviado = { codigo: numero, fechaCreacion };
+
+  return numero;
+}
 
 // Controlador de Administradores
 const httpAdministrador = {
@@ -136,6 +149,7 @@ const httpAdministrador = {
         }
       });
     } catch (error) {
+      console.log(error)
       res.status(500).json({ error });
     }
   },
